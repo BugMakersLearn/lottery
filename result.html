@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="css/reset.css">
     <link rel="stylesheet" type="text/css" href="css/wall.css">
     <style type="text/css">
-        .wall { 
+        .wall {
             overflow: scroll;
             background-repeat: repeat;
         }
@@ -44,15 +44,39 @@
             font-family: '幼圆';
         }
 
+
+        .result {
+            position: absolute;
+            height: 320px;
+            width: 100%;
+            left: 0; top: 50%;
+            margin-top: -160px;
+            text-align: center;
+            padding: 10px;
+        }
+        .result span {
+            display: inline-block;
+            font-size: 25px;
+            width: 150px;
+            background: #fff;
+            line-height: 30px;
+            color: #000;
+            margin: 5px;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+            padding: 10px 0;
+        }
+
     </style>
 </head>
 <body>
 <div id="main" class="wall">
     <div class="result-title">获奖名单</div>
-    <div class="result-list" v-for="result in results">
-        <div v-for="item in result">
-            {{item}}
-        </div>
+<!--    <div class="result-list" v-for="result in results">-->
+<!--        <span v-for="item in result" v-html="item"></span>-->
+<!--    </div>-->
+    <div class="result" v-for="result in results">
+        <span v-for="item in result" v-html="item"></span>
     </div>
 </div>
 <script type="text/javascript" src="js/vue.js"></script>
@@ -79,7 +103,7 @@
                 temp = temp.map(item => {return item.replace('<br/>', ' ')})
                 results.push(temp)
             }
-            
+
             // 根据长度进行排序，名单短的放在前面
             results = results.sort((x, y) => { return x.length - y.length;})
             this.results = results
