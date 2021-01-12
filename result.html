@@ -4,7 +4,7 @@
     <meta name="screen-orientation" content="portrait">
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0"/>
-    <title>年会抽奖小程序</title>
+    <title>东仕集团2021年会中奖名单</title>
     <link rel="stylesheet" type="text/css" href="css/reset.css">
     <link rel="stylesheet" type="text/css" href="css/wall.css">
     <style type="text/css">
@@ -71,12 +71,11 @@
 </head>
 <body>
 <div id="main" class="wall">
-    <div class="result-title">获奖名单</div>
-<!--    <div class="result-list" v-for="result in results">-->
-<!--        <span v-for="item in result" v-html="item"></span>-->
-<!--    </div>-->
-    <div class="result" v-for="result in results">
-        <span v-for="item in result" v-html="item"></span>
+    <div v-for="result in results" style="text-align: center; padding: 50px; margin-top: 24px;">
+        <h1 style="font-size: 80px; color: #FFFFFF;">{{result.name}}</h1>
+        <div style="margin-top: 100px;">
+            <span v-for="winner in result.winner" style="margin-left: 36px; color: #FFFFFF; font-size: 64px;">{{winner}}</span>
+        </div>
     </div>
 </div>
 <script type="text/javascript" src="js/vue.js"></script>
@@ -89,24 +88,43 @@
         mounted () {
             let vm = this
             let locals = window.localStorage
+
             let str_results = []
+
             // 遍历(排除choosed)
             for(let i = 0; i<localStorage.length; i++){
-                if (localStorage.key(i) !== 'choosed') {
-                    str_results.push(localStorage.getItem(localStorage.key(i)))
+                if (localStorage.key(i) == '一等奖') {
+                    let ret = {}
+                    ret.name = '一等奖';
+                    ret.winner = JSON.parse(localStorage.getItem(localStorage.key(i)));
+                    ret.seq = 1
+                    str_results.push(ret)
+                } else if (localStorage.key(i) == '二等奖') {
+                    let ret = {}
+                    ret.name = '二等奖';
+                    ret.winner = JSON.parse(localStorage.getItem(localStorage.key(i)));
+                    ret.seq = 2
+                    str_results.push(ret)
+                } else if (localStorage.key(i) == '三等奖') {
+                    let ret = {}
+                    ret.name = '三等奖';
+                    ret.winner = JSON.parse(localStorage.getItem(localStorage.key(i)));
+                    ret.seq = 3
+                    str_results.push(ret)
                 }
             }
-            // 分割每个string, 并将</br>换成空格
-            let results = []
-            for(let nameList of str_results) {
-                let temp = JSON.parse(nameList)
-                temp = temp.map(item => {return item.replace('<br/>', ' ')})
-                results.push(temp)
-            }
-
-            // 根据长度进行排序，名单短的放在前面
-            results = results.sort((x, y) => { return x.length - y.length;})
-            this.results = results
+            //
+            // // 分割每个string, 并将</br>换成空格
+            // let results = []
+            // for(let nameList of str_results) {
+            //     let temp = JSON.parse(nameList)
+            //     temp = temp.map(item => {return item.replace('<br/>', ' ')})
+            //     results.push(temp)
+            // }
+            //
+            // // 根据长度进行排序，名单短的放在前面
+            // results = results.sort((x, y) => { return x.length - y.length;})
+            this.results = str_results.sort((a,b)=>{return a.seq - b.seq})
         },
     })
 </script>

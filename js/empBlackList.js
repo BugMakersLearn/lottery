@@ -1,4 +1,4 @@
-const empNameList = [
+const empNameBlackList = [
     '高天云',
     '顾赢花',
     '陈虹',
@@ -13,16 +13,13 @@ const empNameList = [
     '赵旖旎',
     '谢周周',
     '袁园',
-    '蔡卫东',
     '苏欣弦',
     '舒钺杉',
     '翟星星',
-    '程嘉根',
     '田艳',
     '王峰',
     '王佳婧',
     '汪铭慧',
-    '欧阳强强',
     '杨雪薇',
     '李培倩',
     '朱燕',
@@ -36,24 +33,7 @@ const empNameList = [
     '张怡臻',
     '张俊杰',
     '张亚倩',
-    '姜莉薇',
-    '姚铖',
-    '姚炅',
-    '姚杰',
-    '周凡婷',
-    '卢丹',
-    '刘欣',
-    '刘悦',
-    '冯智勇',
-    '何昱均',
-    '乐君礽'
+    '姜莉薇'
 ];
 
-// 待抽奖员工名单
-let empList = []
-empNameList.forEach(empName => {
-    let emp = {}
-    emp.name = empName
-    empList.push(emp)
-})
-localStorage.setItem('employeeList', JSON.stringify(empList));
+localStorage.setItem('empNameBlackList', JSON.stringify(empNameBlackList));

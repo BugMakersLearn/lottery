@@ -4,7 +4,7 @@
     <meta name="screen-orientation" content="portrait">
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0"/>
-    <title>年会抽奖小程序</title>
+    <title>东仕集团2021年会抽奖小程序</title>
     <link rel="stylesheet" type="text/css" href="css/reset.css">
     <link rel="stylesheet" type="text/css" href="css/wall.css">
     <style type="text/css">
@@ -23,15 +23,15 @@
             display: none;
         }
         .result span {
-            display: inline-block;
-            font-size: 25px;
-            width: 150px;
-            background: #fff;
-            line-height: 30px;
-            color: #000;
-            margin: 5px;
-            border-radius: 10px;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+            /*display: inline-block;*/
+            /*font-size: 25px;*/
+            /*width: 150px;*/
+            /*background: #fff;*/
+            /*line-height: 30px;*/
+            /*color: #000;*/
+            padding: 50px;
+            /*border-radius: 10px;*/
+            /*box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);*/
             padding: 10px 0;
         }
         button, input, optgroup, select, textarea {
@@ -144,7 +144,7 @@
 <!-- main -->
 <div id="main" class="wall">
     <div class="result-btn">
-       <a href="./result.html" target="_blank">获奖名单</a>
+       <a id="winnerList" href="./result.html" target="_blank" style="display: none;">获奖名单</a>
     </div>
 </div>
 
@@ -154,109 +154,40 @@
 
 <!-- tools -->
 <div id="tools" class="tools">
-    <button style="width: 100px;" v-for="btn in btns" @click="onClick(btn)" class="pure-button" :class="{ 'button-error': selectedBtn.value == btn.value}">{{btn.name}}</button>
-    <button style="width: 100px;" class="pure-button" @click="toggle" :class="{'button-secondary': !running, 'button-success': running}">{{running?'停!':'开始'}}</button>
-    <button style="width: 100px;" class="pure-button button-warning" @click="reset">重置</button>
+    <button style="width: 200px;" class="pure-button button-error" v-if="selectedBtn != null">当前抽取【{{selectedBtn.name}}】</button>
+<!--    <button style="width: 100px;" v-for="btn in btns" @click="onClick(btn)" class="pure-button" :class="{ 'button-error': selectedBtn && selectedBtn.value == btn.value}">{{btn.name}}</button>-->
+<!--    <button style="width: 100px;" class="pure-button" @click="toggle" :class="{'button-secondary': !running, 'button-success': running}">{{running?'停!':'开始'}}</button>-->
+<!--    <button style="width: 100px;" class="pure-button button-warning" @click="reset">重置</button>-->
 </div>
 
 
 <script type="text/javascript" src="js/zepto.js"></script>
 <script type="text/javascript" src="js/vue.js"></script>
 <script type="text/javascript" src="js/tagcanvas.js"></script>
-<script type="text/javascript" src="js/member.js"></script>
-<script type="text/javascript" src="js/member2.js"></script>
 <script type="text/javascript" src="js/emp.js"></script>
+<script type="text/javascript" src="js/func.js"></script>
 <script type="text/javascript">
     (function(){
-
-        let wxOpenIds = []
-        for (let wxOpenId in wxuserList) {
-            wxOpenIds.push(wxOpenId)
-        }
-
-        let member = []
-        empNameList.forEach((empName, index) => {
-            let m = {}
-            m.name = empName
-            m.phone = memberOld[index].phone
-            m.img = 'http://localhost:8080/' + wxuserList[wxOpenIds[index]].headimgurl_localbig
-            member.push(m)
-        })
-
-        console.log(JSON.stringify(member))
-
-        // 已中奖的同事
-        var choosed = JSON.parse(localStorage.getItem('choosed')) || {};
-
-        // 速度
-        var speed = function(){
-            return [0.5 * Math.random() + 0.01, -(0.1 * Math.random() + 0.01)];
-        };
-
-        // 关键信息
-        var getKey = function(item){
-            return item.name + '-' + item.phone;
-        };
-
-        // html 拼装
-        var createHTML = function(){
-            var html = [ '<ul>' ];
-            member.forEach(function(item, index){
-                item.index = index;
-                var key = getKey(item);
-                var color = choosed[key] ? 'yellow' : 'white';
-                // html.push('<li><a href="#" style="color: ' + color + ';">' + item.name + '</a></li>');
-                html.push('<li><a href="#" style="color: ' + color + ';">' + item.name + '<img width="40" height="40" alt="' + item.name + '" src="'+item.img+'"/></a></li>');
-            });
-            html.push('</ul>');
-            return html.join('');
-        };
-
-        // 抽奖
-        var lottery = function(count){
-            var list = canvas.getElementsByTagName('a');
-            var color = 'yellow';
-            var ret = member
-                .filter(function(m, index){
-                    m.index = index;
-                    return !choosed[getKey(m)];
-                })
-                .map(function(m){
-                    return Object.assign({
-                      score: Math.random()
-                    }, m);
-                })
-                .sort(function(a, b){
-                    return a.score - b.score;
-                })
-                .slice(0, count)
-                .map(function(m){
-                  choosed[getKey(m)] = 1;
-                  list[m.index].style.color = color;
-                  return '<img width="120" height="120" alt="' + m.name + '" src="' + m.img + '"/><br/>' + m.name + '<br/>' + m.phone;
-                });
-            localStorage.setItem('choosed', JSON.stringify(choosed));
-            return ret;
-        };
-
-        // 设置 canvas 画布
-        var canvas = document.createElement('canvas');
-        canvas.id = 'myCanvas';
-        canvas.width = document.body.offsetWidth;
-        canvas.height = document.body.offsetHeight;
-        document.getElementById('main').appendChild(canvas);
 
         // vue 组件
         new Vue({
             el: '#tools',
             data: {
-                selectedBtn: {name: '三等奖', value: 6},
+                selectedBtn: null,
                 running: false,
-                btns: [
-                    {name: '三等奖', value: 6},
-                    {name: '二等奖', value: 3},
-                    {name: '一等奖', value: 2}
-                ]
+                btns: {
+                    3: {name: '三等奖', value: 1, rule: 'third'},
+                    2: {name: '二等奖', value: 1, rule: 'second'},
+                    1: {name: '一等奖', value: 1, rule: 'first'}
+                },
+                rules: {
+                    first: {total: 2, used: 0, name: 'Apple 12 PRO 128G 84499 RMB', winner: []},
+                    second: {total: 3, used: 0, name: 'Dyson HP00 空气净化暖风扇', winner: []},
+                    third: {total: 6, used: 0, name: '香氛物品', winner: []}
+                }
+            },
+            created() {
+                document.addEventListener('keydown', this.handleEvent)
             },
             mounted () {
                 canvas.innerHTML = createHTML();
@@ -268,14 +199,57 @@
                 });
             },
             methods: {
-                reset: function(){
-                    // if(confirm('确定要重置么？所有之前的抽奖历史将被清除！')){
-                    //     localStorage.clear();
-                    //     location.reload(true);
-                    // }
+                handleEvent: function(e) {
 
-                    localStorage.clear();
-                    location.reload(true);
+                    console.log(e)
+
+                    let key = e.key
+
+                    // 按键【r】 重置
+                    if (key == 'r') {
+                        this.reset()
+                    }
+                    // 按键【s】 开始
+                    else if (key == 'Enter') {
+                        if (this.selectedBtn == null) {
+                            $('#result').css('display', 'block').html('<span style="width: 280px;">请先按数字设置奖项：<br/>1-一等奖<br/>2-二等奖<br/>3-三等奖</span>');
+                            setTimeout(function(){
+                                $('#result').css('display', 'none').html('');
+                            }, 3000);
+                            return
+                        } else {
+                            this.toggle()
+                        }
+                    }
+                    // 按键【1】 设置当前抽一等奖
+                    else if (key == '1') {
+                        // this.selectedBtn = {name: '一等奖', value: 1, rule: 'first'}
+                        this.selectedBtn = this.btns[1]
+                    }
+                    // 按键【2】 设置当前抽二等奖
+                    else if (key == '2') {
+                        // this.selectedBtn = {name: '二等奖', value: 1, rule: 'second'}
+                        this.selectedBtn = this.btns[2]
+                    }
+                    // 按键【3】 设置当前抽三等奖
+                    else if (key == '3') {
+                        // this.selectedBtn = {name: '三等奖', value: 1, rule: 'third'}
+                        this.selectedBtn = this.btns[3]
+                    }
+                    // 按键【Enter】打开获奖名单
+                    else if (key == ' ') {
+                        document.getElementById("winnerList").click();
+                    }
+                    // 按键【Other】关闭获奖名单
+                    else {
+                        $('#result2').css('display', 'none')
+                    }
+                },
+                reset: function(){
+                    if(confirm('确定要重置么？所有之前的抽奖历史将被清除！')){
+                        localStorage.clear();
+                        location.reload(true);
+                    }
                 },
                 onClick: function(btn){
                     $('#result').css('display', 'none');
@@ -283,19 +257,52 @@
                     this.selectedBtn = btn;
                 },
                 toggle: function(){
+
+                    // 判断是否抽完了
+                    let rule = this.rules[this.selectedBtn.rule]
+                    if (rule.used >= rule.total) {
+                        $('#result').css('display', 'block').html('<span style="width: 240px;">【'+this.selectedBtn.name+'】已抽完</span>');
+                        setTimeout(function(){
+                            $('#result').css('display', 'none').html('');
+                        }, 3000);
+                        return
+                    }
+
                     if(this.running){
                         TagCanvas.SetSpeed('myCanvas', speed());
-                        var ret = lottery(this.selectedBtn.value);
-                        if (ret.length === 0) {
+
+                        // 抽几个
+                        let number = this.selectedBtn.value;
+
+                        var luckEmpList = lottery(number);
+
+                        if (luckEmpList.length === 0) {
                             $('#result').css('display', 'block').html('<span>已抽完</span>');
                             return
                         }
-                        $('#result').css('display', 'block').html('<h1 style="color: #ffffff; font-size: 48px; font-family: \'幼圆\';">' + this.selectedBtn.name + '中奖幸运儿</h1><br/><br/><br/><br/> <span>' + ret.join('</span><span>') + '</span>');
+
+                        let luckEmpNameList = []
+                        luckEmpList.forEach(emp => {luckEmpNameList.push(emp.name)})
+
+                        this.rules[this.selectedBtn.rule].used = this.rules[this.selectedBtn.rule].used + number;
+                        this.rules[this.selectedBtn.rule].winner.push(luckEmpList);
+
+                        $('#result').css('display', 'block').html('<div style="color: #ffffff; font-size: 80px; padding-bottom: 50px;">'
+                            + this.selectedBtn.name
+                            + '</div><br/><br/><br/><br/> <span style="background: none; color: #FFFFFF; font-size: 64px; width: 250px;">'
+                            + luckEmpNameList.join('</span><span style="background: none; color: #FFFFFF; font-size: 64px; width: 200px;">') + '</span>');
                         TagCanvas.Reload('myCanvas');
+
+                        let that = this
                         setTimeout(function(){
-                            localStorage.setItem(this.selectedBtn.name, JSON.stringify(ret));
+
+                            let arr = JSON.parse(localStorage.getItem(that.selectedBtn.name)) || [];
+                            arr.push(luckEmpNameList[0])
+
+                            localStorage.setItem(that.selectedBtn.name, JSON.stringify(arr));
                             $('#main').addClass('mask');
                         }, 300);
+
                     } else {
                         $('#result').css('display', 'none');
                         $('#main').removeClass('mask');
