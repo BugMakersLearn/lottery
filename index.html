@@ -188,6 +188,7 @@
             },
             created() {
                 document.addEventListener('keydown', this.handleEvent)
+                console.log('created')
             },
             mounted () {
                 canvas.innerHTML = createHTML();
@@ -197,11 +198,20 @@
                     dragControl: 1,
                     textHeight: 14
                 });
+
+                // 设置数量
+                let arr1 = JSON.parse(localStorage.getItem(this.btns[1].name)) || [];
+                this.rules.first.used = arr1.length;
+
+                let arr2 = JSON.parse(localStorage.getItem(this.btns[2].name)) || [];
+                this.rules.second.used = arr2.length;
+
+                let arr3 = JSON.parse(localStorage.getItem(this.btns[3].name)) || [];
+                this.rules.third.used = arr3.length;
+                console.log('mounted')
             },
             methods: {
                 handleEvent: function(e) {
-
-                    console.log(e)
 
                     let key = e.key
 
@@ -212,7 +222,7 @@
                     // 按键【s】 开始
                     else if (key == 'Enter') {
                         if (this.selectedBtn == null) {
-                            $('#result').css('display', 'block').html('<span style="width: 280px;">请先按数字设置奖项：<br/>1-一等奖<br/>2-二等奖<br/>3-三等奖</span>');
+                            $('#result').css('display', 'block').html('<span style="width: 280px; background-color: #FFFFFF;">请先按数字设置奖项：<br/>1-一等奖<br/>2-二等奖<br/>3-三等奖</span>');
                             setTimeout(function(){
                                 $('#result').css('display', 'none').html('');
                             }, 3000);
@@ -264,6 +274,7 @@
                         $('#result').css('display', 'block').html('<span style="width: 240px;">【'+this.selectedBtn.name+'】已抽完</span>');
                         setTimeout(function(){
                             $('#result').css('display', 'none').html('');
+                            $('#main').removeClass('mask');
                         }, 3000);
                         return
                     }
