@@ -1,4 +1,4 @@
-const empNameBlackList = [
+const empNameBlackDataList = [
     '高天云',
     '顾赢花',
     '陈虹',
@@ -36,4 +36,4 @@ const empNameBlackList = [
     '姜莉薇'
 ];
 
-localStorage.setItem('empNameBlackList', JSON.stringify(empNameBlackList));
+localStorage.setItem('empNameBlackList', JSON.stringify(empNameBlackDataList));

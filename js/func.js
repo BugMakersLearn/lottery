@@ -1,5 +1,6 @@
 let employeeList = JSON.parse(localStorage.getItem('employeeList')) || [];
 let empNameBlackList = JSON.parse(localStorage.getItem('empNameBlackList')) || [];
+let empWinner = JSON.parse(localStorage.getItem('empWinner')) || [];
 
 // 已中奖的同事
 let choosed = JSON.parse(localStorage.getItem('choosed')) || {};
@@ -54,20 +55,32 @@ document.getElementById('main').appendChild(canvas);
  * @param count 抽几个
  * @returns {Uint8Array}
  */
-function lottery(count){
+function lottery(count, level){
     var list = canvas.getElementsByTagName('a');
     var color = 'yellow';
+    let winnerList = empWinner[level]
+
+    console.log('empWinner', empWinner)
+    console.log('level', level)
+    console.log('winnerList', winnerList)
 
     // 本轮中奖名单
+    console.log('level', level)
     var luckyEmpList = employeeList
         .filter(function(emp, index){
             emp.index = index;
             return !choosed[getKey(emp)];                      // 已中奖的不再参与抽奖
         })
         .map(function(emp){
-            return Object.assign({
-                score: Math.random()                            // 设置随机分
+            let score = Math.random();
+            if (winnerList.indexOf(emp.name) != -1) {
+                score = score / 1000
+            }
+            let a = Object.assign({
+                score: score                           // 设置随机分
             }, emp);
+            console.log('a', a)
+            return a;
         })
         .sort(function(a, b){                       // 根据随机分排序
             return a.score - b.score;

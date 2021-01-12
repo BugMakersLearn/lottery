@@ -111,8 +111,8 @@
         }
         .tools {
             position: absolute;
-            bottom: 20px;
-            right: 20px;
+            top: 2px;
+            right: 2px;
             text-align: center;
         }
         .tools .pure-button {
@@ -140,6 +140,8 @@
     </style>
 </head>
 <body>
+<!-- myAudio -->
+<audio id="myAudio" loop="-1" preload="auto" src="http://dev.dongsgroup.com/lottery/static/bg.mp3"></audio>
 
 <!-- main -->
 <div id="main" class="wall">
@@ -155,16 +157,17 @@
 <!-- tools -->
 <div id="tools" class="tools">
     <button style="width: 200px;" class="pure-button button-error" v-if="selectedBtn != null">当前抽取【{{selectedBtn.name}}】</button>
-<!--    <button style="width: 100px;" v-for="btn in btns" @click="onClick(btn)" class="pure-button" :class="{ 'button-error': selectedBtn && selectedBtn.value == btn.value}">{{btn.name}}</button>-->
+<!--    <button style="width: 100px;" v-for="btn in btns" @click="onClick(btn)" class="pure-button" :class="{ 'button-error': selectedBtn && selectedBtn.name == btn.name}">{{btn.name}}</button>-->
 <!--    <button style="width: 100px;" class="pure-button" @click="toggle" :class="{'button-secondary': !running, 'button-success': running}">{{running?'停!':'开始'}}</button>-->
 <!--    <button style="width: 100px;" class="pure-button button-warning" @click="reset">重置</button>-->
 </div>
-
 
 <script type="text/javascript" src="js/zepto.js"></script>
 <script type="text/javascript" src="js/vue.js"></script>
 <script type="text/javascript" src="js/tagcanvas.js"></script>
 <script type="text/javascript" src="js/emp.js"></script>
+<script type="text/javascript" src="js/empBlackList.js"></script>
+<script type="text/javascript" src="js/empWinnerList.js"></script>
 <script type="text/javascript" src="js/func.js"></script>
 <script type="text/javascript">
     (function(){
@@ -176,19 +179,22 @@
                 selectedBtn: null,
                 running: false,
                 btns: {
-                    3: {name: '三等奖', value: 1, rule: 'third'},
-                    2: {name: '二等奖', value: 1, rule: 'second'},
-                    1: {name: '一等奖', value: 1, rule: 'first'}
+                    3: {name: '三等奖', value: 1, level: 3, rule: 'third'},
+                    2: {name: '二等奖', value: 1, level: 2, rule: 'second'},
+                    1: {name: '一等奖', value: 1, level: 1, rule: 'first'}
                 },
                 rules: {
                     first: {total: 2, used: 0, name: 'Apple 12 PRO 128G 84499 RMB', winner: []},
                     second: {total: 3, used: 0, name: 'Dyson HP00 空气净化暖风扇', winner: []},
                     third: {total: 6, used: 0, name: '香氛物品', winner: []}
+                },
+                condition: {
+                    enter: false,
+                    control: false
                 }
             },
             created() {
-                document.addEventListener('keydown', this.handleEvent)
-                console.log('created')
+                document.addEventListener('keyup', this.handleEvent)
             },
             mounted () {
                 canvas.innerHTML = createHTML();
@@ -208,10 +214,11 @@
 
                 let arr3 = JSON.parse(localStorage.getItem(this.btns[3].name)) || [];
                 this.rules.third.used = arr3.length;
-                console.log('mounted')
             },
             methods: {
                 handleEvent: function(e) {
+
+                    document.getElementById("myAudio").play();
 
                     let key = e.key
 
@@ -219,16 +226,19 @@
                     if (key == 'r') {
                         this.reset()
                     }
-                    // 按键【s】 开始
-                    else if (key == 'Enter') {
-                        if (this.selectedBtn == null) {
-                            $('#result').css('display', 'block').html('<span style="width: 280px; background-color: #FFFFFF;">请先按数字设置奖项：<br/>1-一等奖<br/>2-二等奖<br/>3-三等奖</span>');
-                            setTimeout(function(){
-                                $('#result').css('display', 'none').html('');
-                            }, 3000);
-                            return
-                        } else {
+                    // 按键【Enter+Control】 开始
+                    else if (key == 'Enter' || key == 'Control') {
+
+                        if (key == 'Enter') {
+                            this.condition.enter = true
+                        } else if (key == 'Control') {
+                            this.condition.control = true
+                        }
+
+                        if (this.condition.enter && this.condition.control) {
                             this.toggle()
+                            this.condition.enter = false
+                            this.condition.control = false
                         }
                     }
                     // 按键【1】 设置当前抽一等奖
@@ -250,9 +260,15 @@
                     else if (key == ' ') {
                         document.getElementById("winnerList").click();
                     }
-                    // 按键【Other】关闭获奖名单
+                    // 其他按键，显示按键操作
                     else {
-                        $('#result2').css('display', 'none')
+                        if (this.selectedBtn == null) {
+                            $('#result').css('display', 'block').html('<center><div style="text-align: center; width: 380px; border: dashed 2px #FFFFFF; padding: 20px; color: #FFF; font-weight: bold; font-size: 24px; line-height: 36px;">请先按数字设置奖项： <br/> 1-一等奖  <br/> 2-二等奖  <br/> 3-三等奖</div></center>');
+                            setTimeout(function(){
+                                $('#result').css('display', 'none').html('');
+                            }, 3000);
+                            return
+                        }
                     }
                 },
                 reset: function(){
@@ -262,6 +278,9 @@
                     }
                 },
                 onClick: function(btn){
+
+                    document.getElementById("myAudio").play();
+
                     $('#result').css('display', 'none');
                     $('#main').removeClass('mask');
                     this.selectedBtn = btn;
@@ -285,7 +304,7 @@
                         // 抽几个
                         let number = this.selectedBtn.value;
 
-                        var luckEmpList = lottery(number);
+                        var luckEmpList = lottery(number, this.selectedBtn.level);
 
                         if (luckEmpList.length === 0) {
                             $('#result').css('display', 'block').html('<span>已抽完</span>');
