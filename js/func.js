@@ -1,9 +1,30 @@
+/**
+ * 员工列表
+ * @type {any | *[]}
+ */
 let employeeList = JSON.parse(localStorage.getItem('employeeList')) || [];
+/**
+ * 黑名单列表
+ * @type {any | *[]}
+ */
 let empNameBlackList = JSON.parse(localStorage.getItem('empNameBlackList')) || [];
+/**
+ * 内定列表
+ * @type {any | *[]}
+ */
 let empWinner = JSON.parse(localStorage.getItem('empWinner')) || [];
 
-// 已中奖的同事
+/**
+ * 已中奖的同事
+ * @type {any | {}}
+ */
 let choosed = JSON.parse(localStorage.getItem('choosed')) || {};
+
+/**
+ * 放弃中奖的同事
+ * @type {any | {}}
+ */
+let gaveUpped = JSON.parse(localStorage.getItem('gaveUpped')) || {};
 
 empNameBlackList.forEach(empName => {
     choosed[empName] = 1;
@@ -60,10 +81,6 @@ function lottery(count, level){
     var color = 'yellow';
     let winnerList = empWinner[level]
 
-    console.log('empWinner', empWinner)
-    console.log('level', level)
-    console.log('winnerList', winnerList)
-
     // 本轮中奖名单
     console.log('level', level)
     var luckyEmpList = employeeList
@@ -79,7 +96,6 @@ function lottery(count, level){
             let a = Object.assign({
                 score: score                           // 设置随机分
             }, emp);
-            console.log('a', a)
             return a;
         })
         .sort(function(a, b){                       // 根据随机分排序

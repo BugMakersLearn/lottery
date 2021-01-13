@@ -111,7 +111,7 @@
         }
         .tools {
             position: absolute;
-            top: 2px;
+            bottom: 2px;
             right: 2px;
             text-align: center;
         }
@@ -141,7 +141,7 @@
 </head>
 <body>
 <!-- myAudio -->
-<audio id="myAudio" loop="-1" preload="auto" src="http://dev.dongsgroup.com/lottery/static/bg.mp3"></audio>
+<audio id="myAudio" loop="-1" preload="auto" src="https://h5.dongsgroup.com/lottery/static/bg.mp3"></audio>
 
 <!-- main -->
 <div id="main" class="wall">
@@ -190,8 +190,10 @@
                 },
                 condition: {
                     enter: false,
-                    control: false
-                }
+                    control: false,
+                    z: false
+                },
+                currentWinner: null
             },
             created() {
                 document.addEventListener('keyup', this.handleEvent)
@@ -226,20 +228,17 @@
                     if (key == 'r') {
                         this.reset()
                     }
-                    // 按键【Enter+Control】 开始
-                    else if (key == 'Enter' || key == 'Control') {
-
-                        if (key == 'Enter') {
-                            this.condition.enter = true
-                        } else if (key == 'Control') {
-                            this.condition.control = true
-                        }
-
-                        if (this.condition.enter && this.condition.control) {
-                            this.toggle()
-                            this.condition.enter = false
-                            this.condition.control = false
-                        }
+                    // 按键【Enter】标记
+                    else if (key == 'Enter') {
+                        this.condition.enter = true
+                    }
+                    // 按键【control】标记
+                    else if (key == 'Control') {
+                        this.condition.control = true
+                    }
+                    // 按键【shift】标记
+                    else if (key == 'z') {
+                        this.condition.z = true
                     }
                     // 按键【1】 设置当前抽一等奖
                     else if (key == '1') {
@@ -270,6 +269,37 @@
                             return
                         }
                     }
+
+                    // 【control + enter】抽奖
+                    if (this.condition.enter && this.condition.control) {
+                        this.toggle()
+                        this.condition.enter = false
+                        this.condition.control = false
+                    }
+                    // 【control + z】重抽
+                    if (this.currentWinner != null && this.condition.z && this.condition.control) {
+
+                        // 获取缓存的数据
+                        let arr = JSON.parse(localStorage.getItem(this.selectedBtn.name)) || [];
+
+                        // 冲缓存数据中移除当前中奖人
+                        const index = arr.indexOf(this.currentWinner);
+                        if (index > -1) {
+                            arr.splice(index, 1);
+                            this.rules[this.selectedBtn.rule].used = this.rules[this.selectedBtn.rule].used - 1;
+                            this.rules[this.selectedBtn.rule].winner.splice(0, this.rules[this.selectedBtn.rule].winner.length - 1);
+                        }
+
+                        // 更新缓存数据
+                        localStorage.setItem(this.selectedBtn.name, JSON.stringify(arr));
+
+                        // 清空当前中奖人
+                        this.currentWinner = null
+
+                        this.toggle()
+                        this.condition.z = false
+                        this.condition.control = false
+                    }
                 },
                 reset: function(){
                     if(confirm('确定要重置么？所有之前的抽奖历史将被清除！')){
@@ -286,6 +316,8 @@
                     this.selectedBtn = btn;
                 },
                 toggle: function(){
+
+                    this.currentWinner = null
 
                     // 判断是否抽完了
                     let rule = this.rules[this.selectedBtn.rule]
@@ -314,15 +346,22 @@
                         let luckEmpNameList = []
                         luckEmpList.forEach(emp => {luckEmpNameList.push(emp.name)})
 
+                        // 记录已抽过次数和已抽中名单到 data 对象
                         this.rules[this.selectedBtn.rule].used = this.rules[this.selectedBtn.rule].used + number;
                         this.rules[this.selectedBtn.rule].winner.push(luckEmpList);
 
+                        // 展示本轮抽奖结果
                         $('#result').css('display', 'block').html('<div style="color: #ffffff; font-size: 80px; padding-bottom: 50px;">'
                             + this.selectedBtn.name
                             + '</div><br/><br/><br/><br/> <span style="background: none; color: #FFFFFF; font-size: 64px; width: 250px;">'
                             + luckEmpNameList.join('</span><span style="background: none; color: #FFFFFF; font-size: 64px; width: 200px;">') + '</span>');
+
+                        this.currentWinner = luckEmpNameList[0];
+
+                        // 重载 canvas
                         TagCanvas.Reload('myCanvas');
 
+                        // 缓存中奖记录
                         let that = this
                         setTimeout(function(){
 
