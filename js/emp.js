@@ -48,7 +48,7 @@ const empNameList = [
     '何昱均',
     '乐君礽',
     'Will',
-    'Steven',
+    'Steven'
 ];
 
 // 待抽奖员工名单
