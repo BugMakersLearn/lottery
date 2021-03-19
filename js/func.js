@@ -1,3 +1,20 @@
+console.log('## 东仕2021年会抽奖程序 | 操作说明');
+console.log('### 1. 设置奖项');
+console.log('* 按键盘数字【1】设置为抽取一等奖');
+console.log('* 按键盘数字【2】设置为抽取二等奖');
+console.log('* 按键盘数字【3】设置为抽取三等奖');
+console.log('');
+console.log('### 2. 正常抽奖操作');
+console.log('* 开始抽奖：按键盘组合键【ctrl】+【Enter】');
+console.log('* 停止抽奖：再按一次组合键【ctrl】+【Enter】');
+console.log('');
+console.log('### 3. 重新抽奖操作');
+console.log('* 开始重抽：按键盘组合键【ctrl】+【z】');
+console.log('* 停止抽奖：再按一次组合键【ctrl】+【Enter】');
+console.log('');
+console.log('### 4. 查看中奖名单');
+console.log('* 按键盘【空格键】打开中奖名单界面。');
+
 /**
  * 员工列表
  * @type {any | *[]}
